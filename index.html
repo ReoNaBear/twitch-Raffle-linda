@@ -479,7 +479,7 @@
   //如果獎項名稱有更動
   awardTitle.addEventListener('change', function () {
     awardChange = true
-    newAward = awardTitle.querySelector('input').value
+    newAward = awardTitle.querySelector('input').value.trim()
     if (nowAward === newAward) {
       awardChange = false
       newAward = ''
