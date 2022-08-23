@@ -24,6 +24,7 @@
       margin: 0;
       font-family: 'Noto Sans TC', sans-serif;
       color: white;
+      min-height: 97.9vh;
     }
 
     .title {
@@ -708,12 +709,7 @@
   function makeDrawList(array, index) {
     let finalData = ''
     let drawList = []
-    let thisAwardWinners = []
-    if (!awardChange) {
-      for (let i = winnerNames.length - 1; i > winnerNames.length - 1 - drawAmount; i--) {
-        thisAwardWinners.push(winnerNames[i])
-      }
-    }
+
     if (array[0] !== '') {
       if (index === 1) {
         for (let i = 0; i < array.length; i += 2) {
@@ -724,7 +720,7 @@
         return finalData
       } else {
         for (let i = 0; i < array.length; i += 2) {
-          if (!autoFilter || !thisAwardWinners.includes(array[i + 1])) {
+          if (!autoFilter || !winnerNames.includes(array[i + 1])) {
             drawList.push(`${array[i]} ${array[i + 1]}`)
           }
         }
@@ -810,7 +806,6 @@
     winnerNamesForm.innerHTML = winnerNamesHtml
   }
 
-
   //中獎名單模式切換
   function winnerEdit() {
     editIcon.classList.remove('disable')
@@ -838,10 +833,13 @@
       let sperate = winnerFormEdit.value.trim().split(/\s+/)
       let newWinnerList = []
       let numberPosition = true
+      let hasSperate = false
+      let count = 0
       winnerNames = []
       for (let i = 0; i < sperate.length; i++) {
         if (!sperate[i].includes('=====')) {
           if (numberPosition && (i === 0 || i % 2 === 0)) {
+            count = count + 1
             if (!isNaN(Number(sperate[i]))) {
               newWinnerList.push(`${sperate[i]} ${sperate[i + 1]}`)
               winnerNames.push(sperate[i + 1])
@@ -852,6 +850,7 @@
             }
           }
           if (!numberPosition && (i === 1 || i % 2 === 1)) {
+            count = count + 1
             if (!isNaN(Number(sperate[i]))) {
               newWinnerList.push(`${sperate[i]} ${sperate[i + 1]}`)
               winnerNames.push(sperate[i + 1])
@@ -862,10 +861,23 @@
             }
           }
         } else {
+          count = 0
           numberPosition = !numberPosition
           newWinnerList.push(sperate[i])
           winnerNames.push(sperate[i])
+          if(sperate[i] === `=====${nowAward}=====`){
+            hasSperate = true
+          }
         }
+      }
+      if(!hasSperate){
+        newWinnerList.push(`=====${nowAward}=====`)
+        winnerNames.push(`=====${nowAward}=====`)
+        drawAmount = 0
+        nowDrawNumber.innerText = drawAmount
+      } else {
+        drawAmount = count
+        nowDrawNumber.innerText = drawAmount
       }
       winnerList = newWinnerList
     } else {
