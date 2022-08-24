@@ -408,7 +408,7 @@
         <div class="btn-group" role="group" aria-label="Basic outlined example">
           <div class="col-6">
             <button type="button" class="copy btn multipleTransformBtn deleteBtn" style="border-radius: 0px 0px 0px 8px"
-              onclick="deleteWinnerInList()">將中獎者從抽獎名單刪除</button>
+              onclick="returnList()">沒來只好回復上一動囉</button>
           </div>
           <div class="col-6">
             <button type="button" class="copy btn multipleTransformBtn" style="border-radius: 0px 0px 8px 0px;"
@@ -467,14 +467,14 @@
   let awardTitle = document.querySelector('.award-name')
   let nowDrawNumber = document.querySelector('.draw-Amount')
   let nowPlaying = false
-  let awardChange = false
+  let awardChange = true
   let autoFilter = true
   let winnerList = []
   let winnerNames = []
   let nowAward = ''
   let newAward = ''
   let drawAmount = 0
-
+  let lastWinner = ''
 
   //如果獎項名稱有更動
   awardTitle.addEventListener('change', function () {
@@ -713,8 +713,10 @@
     if (array[0] !== '') {
       if (index === 1) {
         for (let i = 0; i < array.length; i += 2) {
-          for (let j = 1; j <= array[i + 1]; j++) {
-            finalData = finalData + `${j} ${array[i]}\n`
+          if(!winnerNames.includes(array[i])){
+            for (let j = 1; j <= array[i + 1]; j++) {
+              finalData = finalData + `${j} ${array[i]}\n`
+            }
           }
         }
         return finalData
@@ -793,6 +795,7 @@
 
   //重新整理得獎者名單
   function renewWinnerForm() {
+    outputDrawList()
     let winnerHtml = ''
     let winnerNamesHtml = ''
     for (let i = 0; i < winnerList.length; i++) {
@@ -828,49 +831,57 @@
   }
 
   //儲存中獎名單
-  function saveWinnerList() {
+  function saveWinnerList(reverse) {
     if (!!winnerFormEdit.value) {
-      let sperate = winnerFormEdit.value.trim().split(/\s+/)
+      let seperate = winnerFormEdit.value.trim().split(/\s+/)
+      if(reverse){
+        if(!isNaN(Number(seperate[seperate.length-2]))){
+          seperate.splice(-2, 2)
+        } else {
+          seperate.splice(-1, 1)
+        }
+      }
+      console.log(seperate);
       let newWinnerList = []
       let numberPosition = true
-      let hasSperate = false
+      let hasSeperate = false
       let count = 0
       winnerNames = []
-      for (let i = 0; i < sperate.length; i++) {
-        if (!sperate[i].includes('=====')) {
+      for (let i = 0; i < seperate.length; i++) {
+        if (!seperate[i].includes('=====')) {
           if (numberPosition && (i === 0 || i % 2 === 0)) {
             count = count + 1
-            if (!isNaN(Number(sperate[i]))) {
-              newWinnerList.push(`${sperate[i]} ${sperate[i + 1]}`)
-              winnerNames.push(sperate[i + 1])
+            if (!isNaN(Number(seperate[i]))) {
+              newWinnerList.push(`${seperate[i]} ${seperate[i + 1]}`)
+              winnerNames.push(seperate[i + 1])
             } else {
-              newWinnerList.push(`0 ${sperate[i]}`)
-              winnerNames.push(sperate[i])
+              newWinnerList.push(`0 ${seperate[i]}`)
+              winnerNames.push(seperate[i])
               numberPosition = !numberPosition
             }
           }
           if (!numberPosition && (i === 1 || i % 2 === 1)) {
             count = count + 1
-            if (!isNaN(Number(sperate[i]))) {
-              newWinnerList.push(`${sperate[i]} ${sperate[i + 1]}`)
-              winnerNames.push(sperate[i + 1])
+            if (!isNaN(Number(seperate[i]))) {
+              newWinnerList.push(`${seperate[i]} ${seperate[i + 1]}`)
+              winnerNames.push(seperate[i + 1])
             } else {
-              newWinnerList.push(`0 ${sperate[i]}`)
-              winnerNames.push(sperate[i])
+              newWinnerList.push(`0 ${seperate[i]}`)
+              winnerNames.push(seperate[i])
               numberPosition = !numberPosition
             }
           }
         } else {
           count = 0
           numberPosition = !numberPosition
-          newWinnerList.push(sperate[i])
-          winnerNames.push(sperate[i])
-          if(sperate[i] === `=====${nowAward}=====`){
-            hasSperate = true
+          newWinnerList.push(seperate[i])
+          winnerNames.push(seperate[i])
+          if(seperate[i] === `=====${nowAward}=====`){
+            hasSeperate = true
           }
         }
       }
-      if(!hasSperate){
+      if(!hasSeperate){
         newWinnerList.push(`=====${nowAward}=====`)
         winnerNames.push(`=====${nowAward}=====`)
         drawAmount = 0
@@ -888,30 +899,15 @@
   }
 
   //刪除中獎的那些資料
-  function deleteWinnerInList() {
+  function returnList() {
     if (winnerMode === 'read') {
       if (nowMode === 'auto') {
-        let data = ''
-        let form = document.querySelector('.multipleTransform.auto')
-        if (form.value) {
-          let array = form.value.trim().split(/\s+/)
-          for (let i = 0; i < array.length; i += 2) {
-            if (!winnerList.includes(`${array[i]} ${array[i + 1]}`)) {
-              data = data + `${array[i]} ${array[i + 1]}\n`
-            }
-          }
-          if (data !== '') {
-            form.innerHTML = data
-          }
-        }
+        saveWinnerList(true)
       }
     } else {
       toastr.error('請先儲存中獎者名單')
     }
   }
-
-
-
 
 </script>
 
