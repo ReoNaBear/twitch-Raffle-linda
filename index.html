@@ -247,11 +247,9 @@
     }
 
     .award-name {
+      display: flex;
       position: absolute;
       right: 2%;
-      top: 2%;
-      line-height: calc(30vw/192);
-      font-size: calc(17vw/19.2);
     }
 
     @keyframes verticleMoving {
@@ -387,14 +385,18 @@
           <i class="fa-solid fa-pen-to-square"></i>
           <i class="fa-solid fa-check disable"></i>
         </div>
-        <textarea readonly class="winnerForm" name="winnerForm" id="winnerForm" cols="30" rows="8"></textarea>
-        <textarea class="winnerFormEdit disable" name="winnerForm" id="winnerForm" cols="30" rows="8"></textarea>
+        <div style="display: flex;">
+          <textarea readonly class="winnerFormA" name="winnerFormA" id="winnerFormA" cols="50" rows="8"></textarea>
+          <textarea class="winnerFormEditA disable" name="winnerFormA" id="winnerFormA" cols="50" rows="8"></textarea>
+          <textarea readonly class="winnerFormB" name="winnerFormB" id="winnerFormB" cols="50" rows="8"></textarea>
+          <textarea class="winnerFormEditB disable" name="winnerFormB" id="winnerFormB" cols="50" rows="8"></textarea>
+        </div>
         <textarea class="winnerNamesForm" name="winnerForm" id="winnerForm" cols="10" rows="2" style="position: absolute;
         z-index: -99;"></textarea>
         <div class="btn-group" role="group" aria-label="Basic outlined example">
           <div class="col-6">
             <button type="button" class="copy btn multipleTransformBtn" style="background-color: #D2BBF2; color: #000;"
-              disabled>當前獎項已中獎數: <span class="draw-Amount">0</span></button>
+              disabled>當前獎項已中獎數: A:<span class="draw-AmountA">0</span> B:<span class="draw-AmountB">0</span> </button>
           </div>
           <div class="col-6">
             <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" checked>
@@ -421,7 +423,17 @@
   <div class="col-12" style="margin: 0; display:flex;">
     <div class="card slot-machine">
       <h3 class="card-title"><i class="fa-solid fa-trophy"></i> 抽獎拉霸機!</h3>
-      <div class="award-name">當前獎項: <input type="text"></div>
+      <div class="award-name">
+        <div>
+          當前獎項
+        </div>
+        <select class="form-select" aria-label="Default select example">
+          <option selected value="A">A</option>
+          <option value="B">B</option>
+          <option value="C">C</option>
+          <option value="D">D</option>
+        </select>
+      </div>
       <h5 style=" text-align: center;"><i class="fa-solid fa-face-smile-wink"></i> 小提示: 點擊右方把手即可開始抽獎</h5>
       <canvas></canvas>
     </div>
@@ -455,34 +467,44 @@
   let winnerMode = 'read'
   let editIcon = document.querySelector('.fa-pen-to-square')
   let checkIcon = document.querySelector('.fa-check')
-  let winnerFormEdit = document.querySelector('.winnerFormEdit')
+  let winnerFormEditA = document.querySelector('.winnerFormEditA')
+  let winnerFormEditB = document.querySelector('.winnerFormEditB')
   let checkbox = document.querySelector('.btn-check')
-  let winnerForm = document.querySelector('.winnerForm')
+  let winnerFormA = document.querySelector('.winnerFormA')
+  let winnerFormB = document.querySelector('.winnerFormB')
   let winnerNamesForm = document.querySelector('.winnerNamesForm')
   let ball = document.querySelector('.bar-item-circle')
   let handle = document.querySelector('.bar-item-verticle .rectangle')
   let verticle = document.querySelector('.bar-item-verticle .ellipse')
   let filterClose = document.querySelector('.filter-close')
   let filterOpen = document.querySelector('.filter-open')
-  let awardTitle = document.querySelector('.award-name')
-  let nowDrawNumber = document.querySelector('.draw-Amount')
+  let awardTitle = document.querySelector('.form-select')
+  let nowDrawNumberA = document.querySelector('.draw-AmountA')
+  let nowDrawNumberB = document.querySelector('.draw-AmountB')
   let nowPlaying = false
   let awardChange = false
   let autoFilter = true
   let winnerList = []
   let winnerNames = []
-  let nowAward = ''
+  let nowAward = 'A'
   let newAward = ''
-  let drawAmount = 0
+  let drawAmountA = 0
+  let drawAmountB = 0
   let lastWinner = ''
+  let nowAwardSide = false
 
   //如果獎項名稱有更動
   awardTitle.addEventListener('change', function () {
     awardChange = true
-    newAward = awardTitle.querySelector('input').value.trim()
+    newAward = awardTitle.value
     if (nowAward === newAward) {
       awardChange = false
       newAward = ''
+    }
+    if(awardTitle.value === 'A' || awardTitle.value === 'C'){
+      nowAwardSide = false
+    } else {
+      nowAwardSide = true
     }
   })
 
@@ -775,21 +797,90 @@
   //將新的中獎者加入名單
   function setWinnerList(winner) {
     if (awardChange) {
-      winnerList.push(`=====${newAward}=====`)
-      winnerNames.push(`=====${newAward}=====`)
+      let options = awardTitle.querySelectorAll('option')
+      let label = options.querySelector('option:checked')
+      
+      if(!nowAwardSide){
+        if(!winnerListA.includes(`=====${label}=====`)){
+          winnerListA.push(`=====${label}=====`)
+          let indexOfA = winnerListA.indexOf(`=====${options.querySelector('option[value="A"]').innerText}=====`)
+          let indexOfC = winnerListA.indexOf(`=====${options.querySelector('option[value="C"]').innerText}=====`)
+          let indexOfEnd = winnerListA.length -1
+          if(indexOfA && indexOfC && indexOfEnd){
+            if(indexOfA > indexOfC){
+              if(awardTitle.value === 'A'){
+                drawAmountA = indexOfEnd - indexOfA
+              } else if (awardTitle.value === 'C') {
+                drawAmountA = indexOfA - indexOfC - 1
+              }
+            } else if (indexOfA < indexOfC){
+              if(awardTitle.value === 'A'){
+                drawAmountA =  indexOfC - indexOfA - 1
+              } else if (awardTitle.value === 'C') {
+                drawAmountA = indexOfEnd - indexOfC
+              }
+            }
+          } else if (indexOfA){
+            drawAmountA = indexOfEnd - indexOfA
+          } else if (indexOfC){
+            drawAmountA = indexOfEnd - indexOfC
+          } 
+        }
+
+      } else {
+        if(!winnerListB.includes(`=====${newAward}=====`)){
+          winnerListB.push(`=====${newAward}=====`)
+          let indexOfB = winnerListB.indexOf(`=====${options.querySelector('option[value="B"]').innerText}=====`)
+          let indexOfD = winnerListB.indexOf(`=====${options.querySelector('option[value="D"]').innerText}=====`)
+          let indexOfEnd = winnerListB.length -1
+          if(indexOfB && indexOfD && indexOfEnd){
+            if(indexOfA > indexOfD){
+              if(awardTitle.value === 'B'){
+                drawAmountB = indexOfEnd - indexOfB
+              } else if (awardTitle.value === 'D') {
+                drawAmountB = indexOfB - indexOfD - 1
+              }
+            } else if (indexOfB < indexOfD){
+              if(awardTitle.value === 'B'){
+                drawAmountB =  indexOfD - indexOfB - 1
+              } else if (awardTitle.value === 'D') {
+                drawAmountB = indexOfEnd - indexOfD
+              }
+            }
+          } else if (indexOfB){
+            drawAmountA = indexOfEnd - indexOfB
+          } else if (indexOfD){
+            drawAmountA = indexOfEnd - indexOfD
+          } 
+        }
+      }
+      if(!winnerNames.includes(`=====${newAward}=====`)){
+        winnerNames.push(`=====${newAward}=====`)
+      }
       nowAward = newAward
       awardChange = false
       newAward = ''
-      drawAmount = 0
-      nowDrawNumber.innerText = drawAmount
+      nowDrawNumberA.innerText = drawAmountA
+      nowDrawNumberB.innerText = drawAmountB
     }
-    drawAmount += 1
-    nowDrawNumber.innerText = drawAmount
-    if(!winnerList[0]){
-      winnerList.push(`=====${newAward}=====`)
-      winnerNames.push(`=====${newAward}=====`)
+    if(!nowAwardSide){
+      drawAmountA += 1
+      nowDrawNumberA.innerText = drawAmountA
+      if(!winnerListA[0]){
+        winnerListA.push(`=====${nowAward}=====`)
+        winnerNames.push(`=====${nowAward}=====`)
+      }
+      winnerListA.push(winner)
+
+    } else {
+      drawAmountB += 1
+      nowDrawNumberB.innerText = drawAmountB
+      if(!winnerListB[0]){
+        winnerListB.push(`=====${nowAward}=====`)
+        winnerNames.push(`=====${nowAward}=====`)
+      }
+      winnerListB.push(winner)
     }
-    winnerList.push(winner)
     winnerNames.push(winner.trim().split(/\s+/)[1])
 
     setTimeout(() => {
@@ -802,14 +893,23 @@
     outputDrawList()
     let winnerHtml = ''
     let winnerNamesHtml = ''
-    for (let i = 0; i < winnerList.length; i++) {
-      winnerHtml = winnerHtml + `${winnerList[i]}\n`
+    let nowWinnerList
+    if(!nowAwardSide){
+      for (let i = 0; i < winnerListA.length; i++) {
+        winnerHtml = winnerHtml + `${winnerListA[i]}\n`
+      }
+      winnerFormA.innerHTML = winnerHtml
+      winnerFormEditA.value = winnerFormA.value
+    } else {
+      for (let i = 0; i < winnerListB.length; i++) {
+        winnerHtml = winnerHtml + `${winnerListB[i]}\n`
+      }
+      winnerFormB.innerHTML = winnerHtml
+      winnerFormEditB.value = winnerFormB.value
     }
     for (let i = 0; i < winnerNames.length; i++) {
       winnerNamesHtml = winnerNamesHtml + `${winnerNames[i]}\n`
     }
-    winnerForm.innerHTML = winnerHtml
-    winnerFormEdit.value = winnerForm.value
     winnerNamesForm.innerHTML = winnerNamesHtml
   }
 
@@ -817,23 +917,26 @@
   function winnerEdit() {
     editIcon.classList.remove('disable')
     checkIcon.classList.remove('disable')
-    winnerFormEdit.classList.remove('disable')
-    winnerForm.classList.remove('disable')
-
+    winnerFormEditA.classList.remove('disable')
+    winnerFormA.classList.remove('disable')
+    winnerFormEditB.classList.remove('disable')
+    winnerFormB.classList.remove('disable')
     if (winnerMode === 'read') {
       editIcon.classList.add('disable')
       winnerMode = 'edit'
-      winnerForm.classList.add('disable')
+      winnerFormA.classList.add('disable')
+      winnerFormB.classList.add('disable')
       toastr.info('開始編輯中獎者名單，記得儲存')
     } else {
       checkIcon.classList.add('disable')
       winnerMode = 'read'
-      winnerFormEdit.classList.add('disable')
+      winnerFormEditA.classList.add('disable')
+      winnerFormEditB.classList.add('disable')
       saveWinnerList()
       toastr.info('成功儲存')
     }
   }
-
+/////TODO
   //儲存中獎名單
   function saveWinnerList(reverse) {
     if (!!winnerFormEdit.value) {
