@@ -785,6 +785,10 @@
     }
     drawAmount += 1
     nowDrawNumber.innerText = drawAmount
+    if(!winnerList[0]){
+      winnerList.push(`=====${newAward}=====`)
+      winnerNames.push(`=====${newAward}=====`)
+    }
     winnerList.push(winner)
     winnerNames.push(winner.trim().split(/\s+/)[1])
 
