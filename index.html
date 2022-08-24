@@ -467,7 +467,7 @@
   let awardTitle = document.querySelector('.award-name')
   let nowDrawNumber = document.querySelector('.draw-Amount')
   let nowPlaying = false
-  let awardChange = true
+  let awardChange = false
   let autoFilter = true
   let winnerList = []
   let winnerNames = []
@@ -834,14 +834,16 @@
   function saveWinnerList(reverse) {
     if (!!winnerFormEdit.value) {
       let seperate = winnerFormEdit.value.trim().split(/\s+/)
+      let lastPerson = ''
       if(reverse){
         if(!isNaN(Number(seperate[seperate.length-2]))){
-          seperate.splice(-2, 2)
+          let remove = seperate.splice(-2, 2)
+          lastPerson = remove[1]
         } else {
-          seperate.splice(-1, 1)
+          let remove = seperate.splice(-1, 1)
+          lastPerson = remove[0]
         }
       }
-      console.log(seperate);
       let newWinnerList = []
       let numberPosition = true
       let hasSeperate = false
@@ -891,10 +893,19 @@
         nowDrawNumber.innerText = drawAmount
       }
       winnerList = newWinnerList
+
+      if(reverse){
+        if(lastPerson.includes('=====')){
+          toastr.success(`準備抽出第一位幸運兒`)
+        } else {
+          toastr.success(`${lastPerson}已回到天台 準備開飛`)
+        }
+      }
     } else {
       winnerList = [`=====${nowAward}=====`]
       winnerNames = [`=====${nowAward}=====`]
     }
+    
     renewWinnerForm()
   }
 
