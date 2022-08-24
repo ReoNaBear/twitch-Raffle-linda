@@ -484,7 +484,8 @@
   let nowPlaying = false
   let awardChange = false
   let autoFilter = true
-  let winnerList = []
+  let winnerListA = []
+  let winnerListB = []
   let winnerNames = []
   let nowAward = 'A'
   let newAward = ''
@@ -501,7 +502,8 @@
       awardChange = false
       newAward = ''
     }
-    if(awardTitle.value === 'A' || awardTitle.value === 'C'){
+    console.log(awardTitle.value);
+    if (awardTitle.value === 'A' || awardTitle.value === 'C') {
       nowAwardSide = false
     } else {
       nowAwardSide = true
@@ -596,11 +598,13 @@
             }
             else {
               text = drawList[data - 1]
+              console.log(drawList[data - 1]);
               setWinnerList(drawList[data - 1])
             }
             drawAnimationDetail(text)
           }
           ).catch(e => {
+            console.log(e);
             if (drawList.length === 1 && !!drawList[0]) {
               text = drawList[0]
               setWinnerList(drawList[0])
@@ -735,7 +739,7 @@
     if (array[0] !== '') {
       if (index === 1) {
         for (let i = 0; i < array.length; i += 2) {
-          if(!winnerNames.includes(array[i])){
+          if (!winnerNames.includes(array[i])) {
             for (let j = 1; j <= array[i + 1]; j++) {
               finalData = finalData + `${j} ${array[i]}\n`
             }
@@ -761,10 +765,10 @@
     let multipleTransform = document.querySelector('.multipleTransform')
     let excelData = excelInputArea.value
     if (!!excelData.trim()) {
-      let seperate = excelData.trim().split(/\s+/)
-      let complicateData = seperate
+      let separate = excelData.trim().split(/\s+/)
+      let complicateData = separate
 
-      seperate.forEach((e, index) => {
+      separate.forEach((e, index) => {
         if (e.split("")[0] == '(') {
           complicateData[index - 1] = complicateData[index - 1] + e
           complicateData.splice(index, 1)
@@ -796,105 +800,142 @@
 
   //將新的中獎者加入名單
   function setWinnerList(winner) {
-    if (awardChange) {
-      let options = awardTitle.querySelectorAll('option')
-      let label = options.querySelector('option:checked')
-      
-      if(!nowAwardSide){
-        if(!winnerListA.includes(`=====${label}=====`)){
-          winnerListA.push(`=====${label}=====`)
-          let indexOfA = winnerListA.indexOf(`=====${options.querySelector('option[value="A"]').innerText}=====`)
-          let indexOfC = winnerListA.indexOf(`=====${options.querySelector('option[value="C"]').innerText}=====`)
-          let indexOfEnd = winnerListA.length -1
-          if(indexOfA && indexOfC && indexOfEnd){
-            if(indexOfA > indexOfC){
-              if(awardTitle.value === 'A'){
-                drawAmountA = indexOfEnd - indexOfA
-              } else if (awardTitle.value === 'C') {
-                drawAmountA = indexOfA - indexOfC - 1
-              }
-            } else if (indexOfA < indexOfC){
-              if(awardTitle.value === 'A'){
-                drawAmountA =  indexOfC - indexOfA - 1
-              } else if (awardTitle.value === 'C') {
-                drawAmountA = indexOfEnd - indexOfC
-              }
-            }
-          } else if (indexOfA){
-            drawAmountA = indexOfEnd - indexOfA
-          } else if (indexOfC){
-            drawAmountA = indexOfEnd - indexOfC
-          } 
-        }
+    winnerNames.push(winner.trim().split(/\s+/)[1])
+    let options = awardTitle.querySelectorAll('option')
+    let label = awardTitle.querySelector('option:checked').innerText
+    let indexOfA = winnerListA.indexOf(`=====${awardTitle.querySelector('option[value="A"]').innerText}=====`)
+    let indexOfC = winnerListA.indexOf(`=====${awardTitle.querySelector('option[value="C"]').innerText}=====`)
+    let indexOfB = winnerListB.indexOf(`=====${awardTitle.querySelector('option[value="B"]').innerText}=====`)
+    let indexOfD = winnerListB.indexOf(`=====${awardTitle.querySelector('option[value="D"]').innerText}=====`)
 
-      } else {
-        if(!winnerListB.includes(`=====${newAward}=====`)){
-          winnerListB.push(`=====${newAward}=====`)
-          let indexOfB = winnerListB.indexOf(`=====${options.querySelector('option[value="B"]').innerText}=====`)
-          let indexOfD = winnerListB.indexOf(`=====${options.querySelector('option[value="D"]').innerText}=====`)
-          let indexOfEnd = winnerListB.length -1
-          if(indexOfB && indexOfD && indexOfEnd){
-            if(indexOfA > indexOfD){
-              if(awardTitle.value === 'B'){
-                drawAmountB = indexOfEnd - indexOfB
-              } else if (awardTitle.value === 'D') {
-                drawAmountB = indexOfB - indexOfD - 1
-              }
-            } else if (indexOfB < indexOfD){
-              if(awardTitle.value === 'B'){
-                drawAmountB =  indexOfD - indexOfB - 1
-              } else if (awardTitle.value === 'D') {
-                drawAmountB = indexOfEnd - indexOfD
-              }
-            }
-          } else if (indexOfB){
-            drawAmountA = indexOfEnd - indexOfB
-          } else if (indexOfD){
-            drawAmountA = indexOfEnd - indexOfD
-          } 
-        }
-      }
-      if(!winnerNames.includes(`=====${newAward}=====`)){
-        winnerNames.push(`=====${newAward}=====`)
-      }
+    if (awardChange) {
       nowAward = newAward
       awardChange = false
       newAward = ''
-      nowDrawNumberA.innerText = drawAmountA
-      nowDrawNumberB.innerText = drawAmountB
-    }
-    if(!nowAwardSide){
-      drawAmountA += 1
-      nowDrawNumberA.innerText = drawAmountA
-      if(!winnerListA[0]){
-        winnerListA.push(`=====${nowAward}=====`)
-        winnerNames.push(`=====${nowAward}=====`)
+      if (!nowAwardSide) {
+        let indexOfEnd = winnerListA.length - 1
+        if (!winnerListA.includes(`=====${label}=====`)) {
+          drawAmountA = 1
+          winnerListA.push(`=====${label}=====`)
+          winnerListA.push(winner.trim().split(/\s+/)[1])
+        } else {
+          if (indexOfA >= 0 && indexOfC >= 0) {
+            if (indexOfA > indexOfC) {
+              if (awardTitle.value === 'A') {
+                winnerListA.push(winner.trim().split(/\s+/)[1])
+                drawAmountA = indexOfEnd - indexOfA
+              } else if (awardTitle.value === 'C') {
+                winnerListA.splice(indexOfA, 0, winner.trim().split(/\s+/)[1])
+                drawAmountA = indexOfA - indexOfC
+              }
+            } else if (indexOfA < indexOfC) {
+              if (awardTitle.value === 'A') {
+                winnerListA.splice(indexOfC, 0, winner.trim().split(/\s+/)[1])
+                drawAmountA = indexOfC - indexOfA
+              } else if (awardTitle.value === 'C') {
+                winnerListA.push(winner.trim().split(/\s+/)[1])
+                drawAmountA = indexOfEnd - indexOfC + 1
+              }
+            }
+          } else if (indexOfA >= 0) {
+            drawAmountA = indexOfEnd - indexOfA + 1
+            winnerListA.push(winner.trim().split(/\s+/)[1])
+          } else if (indexOfC >= 0) {
+            winnerListA.push(winner.trim().split(/\s+/)[1])
+            drawAmountA = indexOfEnd - indexOfC + 1
+          }
+        }
+        nowDrawNumberA.innerText = drawAmountA
+      } else {
+        let indexOfEnd = winnerListB.length - 1
+        if (!winnerListB.includes(`=====${label}=====`)) {
+          drawAmountB = 1
+          winnerListB.push(`=====${label}=====`)
+          winnerListB.push(winner.trim().split(/\s+/)[1])
+        } else {
+          if (indexOfB >= 0 && indexOfD >= 0) {
+            if (indexOfB > indexOfD) {
+              if (awardTitle.value === 'B') {
+                winnerListB.push(winner.trim().split(/\s+/)[1])
+                drawAmountB = indexOfEnd - indexOfB + 1
+              } else if (awardTitle.value === 'D') {
+                winnerListB.splice(indexOfB, 0, winner.trim().split(/\s+/)[1])
+                drawAmountB = indexOfB - indexOfD
+              }
+            } else if (indexOfB < indexOfD) {
+              if (awardTitle.value === 'B') {
+                drawAmountB = indexOfD - indexOfB
+                winnerListB.splice(indexOfD, 0, winner.trim().split(/\s+/)[1])
+              } else if (awardTitle.value === 'D') {
+                winnerListB.push(winner.trim().split(/\s+/)[1])
+                drawAmountB = indexOfEnd - indexOfD + 1
+              }
+            }
+          } else if (indexOfB >= 0) {
+            winnerListB.push(winner.trim().split(/\s+/)[1])
+            drawAmountB = indexOfEnd - indexOfB + 1
+          } else if (indexOfD >= 0) {
+            drawAmountB = indexOfEnd - indexOfD + 1
+            winnerListB.push(winner.trim().split(/\s+/)[1])
+          }
+          nowDrawNumberB.innerText = drawAmountB
+        }
       }
-      winnerListA.push(winner)
-
     } else {
-      drawAmountB += 1
-      nowDrawNumberB.innerText = drawAmountB
-      if(!winnerListB[0]){
-        winnerListB.push(`=====${nowAward}=====`)
-        winnerNames.push(`=====${nowAward}=====`)
+      if (!nowAwardSide) {
+        drawAmountA += 1
+        nowDrawNumberA.innerText = drawAmountA
+        if (!winnerListA.includes(`=====${nowAward}=====`)) {
+          winnerListA.push(`=====${nowAward}=====`)
+        }
+        if (awardTitle.value === 'A') {
+          if (indexOfA > indexOfC || indexOfC === -1) {
+            winnerListA.push(winner.trim().split(/\s+/)[1])
+          } else if (indexOfC > indexOfA) {
+            winnerListA.splice(indexOfC, 0, winner.trim().split(/\s+/)[1])
+          }
+        } else if (awardTitle.value === 'C') {
+          if (indexOfC > indexOfA || indexOfA === -1) {
+            winnerListA.push(winner.trim().split(/\s+/)[1])
+          } else if (indexOfA > indexOfC) {
+            winnerListA.splice(indexOfA, 0, winner.trim().split(/\s+/)[1])
+          }
+        }
+
+      } else {
+        drawAmountB += 1
+        nowDrawNumberB.innerText = drawAmountB
+        if (!winnerListB.includes(`=====${nowAward}=====`)) {
+          winnerListB.push(`=====${nowAward}=====`)
+        }
+        if (awardTitle.value === 'B') {
+          if (indexOfB > indexOfD || indexOfD === -1) {
+            winnerListB.push(winner.trim().split(/\s+/)[1])
+          } else if (indexOfD > indexOfB) {
+            winnerListB.splice(indexOfD, 0, winner.trim().split(/\s+/)[1])
+          }
+        } else if (awardTitle.value === 'D') {
+          if (indexOfD > indexOfB || indexOfB === -1) {
+            winnerListB.push(winner.trim().split(/\s+/)[1])
+          } else if (indexOfB > indexOfD) {
+            winnerListB.splice(indexOfB, 0, winner.trim().split(/\s+/)[1])
+          }
+        }
       }
-      winnerListB.push(winner)
     }
-    winnerNames.push(winner.trim().split(/\s+/)[1])
 
     setTimeout(() => {
       renewWinnerForm()
     }, 4500);
-  }
 
+  }
   //重新整理得獎者名單
   function renewWinnerForm() {
     outputDrawList()
     let winnerHtml = ''
     let winnerNamesHtml = ''
     let nowWinnerList
-    if(!nowAwardSide){
+    if (!nowAwardSide) {
       for (let i = 0; i < winnerListA.length; i++) {
         winnerHtml = winnerHtml + `${winnerListA[i]}\n`
       }
@@ -907,9 +948,7 @@
       winnerFormB.innerHTML = winnerHtml
       winnerFormEditB.value = winnerFormB.value
     }
-    for (let i = 0; i < winnerNames.length; i++) {
-      winnerNamesHtml = winnerNamesHtml + `${winnerNames[i]}\n`
-    }
+    winnerNamesHtml = winnerFormA.innerHTML + winnerFormB.innerHTML
     winnerNamesForm.innerHTML = winnerNamesHtml
   }
 
@@ -936,83 +975,129 @@
       toastr.info('成功儲存')
     }
   }
-/////TODO
+  /////TODO
   //儲存中獎名單
   function saveWinnerList(reverse) {
-    if (!!winnerFormEdit.value) {
-      let seperate = winnerFormEdit.value.trim().split(/\s+/)
-      let lastPerson = ''
-      if(reverse){
-        if(!isNaN(Number(seperate[seperate.length-2]))){
-          let remove = seperate.splice(-2, 2)
-          lastPerson = remove[1]
-        } else {
-          let remove = seperate.splice(-1, 1)
-          lastPerson = remove[0]
-        }
-      }
+    let label = awardTitle.querySelector('option:checked').innerText
+    let indexOfA = winnerListA.indexOf(`=====${awardTitle.querySelector('option[value="A"]').innerText}=====`)
+    let indexOfC = winnerListA.indexOf(`=====${awardTitle.querySelector('option[value="C"]').innerText}=====`)
+    let indexOfB = winnerListB.indexOf(`=====${awardTitle.querySelector('option[value="B"]').innerText}=====`)
+    let indexOfD = winnerListB.indexOf(`=====${awardTitle.querySelector('option[value="D"]').innerText}=====`)
+    let lastPerson = ''
+    if (!!winnerFormEditA.value || !!winnerFormEditB.value) {
+      let hasSeparate = false
       let newWinnerList = []
-      let numberPosition = true
-      let hasSeperate = false
-      let count = 0
-      winnerNames = []
-      for (let i = 0; i < seperate.length; i++) {
-        if (!seperate[i].includes('=====')) {
-          if (numberPosition && (i === 0 || i % 2 === 0)) {
-            count = count + 1
-            if (!isNaN(Number(seperate[i]))) {
-              newWinnerList.push(`${seperate[i]} ${seperate[i + 1]}`)
-              winnerNames.push(seperate[i + 1])
-            } else {
-              newWinnerList.push(`0 ${seperate[i]}`)
-              winnerNames.push(seperate[i])
-              numberPosition = !numberPosition
+
+      if (nowAwardSide) {
+        let separate = winnerFormEditB.value.trim().split(/\s+/)
+        console.log(separate);
+        if (reverse) {
+          if (awardTitle.value === 'B') {
+            if (indexOfB > indexOfD || indexOfD === -1) {
+              let remove = separate.splice(-1, 1)
+              lastPerson = remove[0]
+            } else if (indexOfD > indexOfB) {
+              let remove = separate.splice(indexOfD - 1, 1)
+              lastPerson = remove[0]
             }
-          }
-          if (!numberPosition && (i === 1 || i % 2 === 1)) {
-            count = count + 1
-            if (!isNaN(Number(seperate[i]))) {
-              newWinnerList.push(`${seperate[i]} ${seperate[i + 1]}`)
-              winnerNames.push(seperate[i + 1])
-            } else {
-              newWinnerList.push(`0 ${seperate[i]}`)
-              winnerNames.push(seperate[i])
-              numberPosition = !numberPosition
+          } else if (awardTitle.value === 'D') {
+            if (indexOfD > indexOfB || indexOfB === -1) {
+              let remove = separate.splice(-1, 1)
+              lastPerson = remove[0]
+            } else if (indexOfB > indexOfD) {
+              let remove = separate.splice(indexOfB, 1)
+              lastPerson = remove[0]
             }
-          }
-        } else {
-          count = 0
-          numberPosition = !numberPosition
-          newWinnerList.push(seperate[i])
-          winnerNames.push(seperate[i])
-          if(seperate[i] === `=====${nowAward}=====`){
-            hasSeperate = true
           }
         }
-      }
-      if(!hasSeperate){
-        newWinnerList.push(`=====${nowAward}=====`)
-        winnerNames.push(`=====${nowAward}=====`)
-        drawAmount = 0
-        nowDrawNumber.innerText = drawAmount
-      } else {
-        drawAmount = count
-        nowDrawNumber.innerText = drawAmount
-      }
-      winnerList = newWinnerList
+        let count = 0
 
-      if(reverse){
-        if(lastPerson.includes('=====')){
+        for (let i = 0; i < separate.length; i++) {
+          if (!separate[i].includes('=====')) {
+            count = count + 1
+            newWinnerList.push(separate[i])
+          }
+          else {
+            count = 0
+            newWinnerList.push(separate[i])
+            if (separate[i] === `=====${label}=====`) {
+              hasSeparate = true
+            }
+          }
+        }
+        if (!hasSeparate) {
+          newWinnerList.push(`=====${label}=====`)
+          drawAmountB = 0
+          nowDrawNumberB.innerText = drawAmountB
+          winnerListB = newWinnerList
+        } else {
+          drawAmountB = count
+          nowDrawNumberB.innerText = drawAmountB
+          winnerListB = newWinnerList
+        }
+      } else {
+        let separate = winnerFormEditA.value.trim().split(/\s+/)
+        if (reverse) {
+
+          if (awardTitle.value === 'A') {
+            if (indexOfA > indexOfC || indexOfC === -1) {
+              let remove = separate.splice(-1, 1)
+              lastPerson = remove[0]
+            } else if (indexOfC > indexOfA) {
+              let remove = separate.splice(indexOfC - 1, 1)
+              lastPerson = remove[0]
+            }
+          } else if (awardTitle.value === 'C') {
+            if (indexOfC > indexOfA || indexOfA === -1) {
+              let remove = separate.splice(-1, 1)
+              lastPerson = remove[0]
+            } else if (indexOfA > indexOfC) {
+              let remove = separate.splice(indexOfA - 1, 1)
+              lastPerson = remove[0]
+            }
+          }
+        }
+        let count = 0
+        for (let i = 0; i < separate.length; i++) {
+          if (!separate[i].includes('=====')) {
+            count = count + 1
+            newWinnerList.push(separate[i])
+          }
+          else {
+            count = 0
+            newWinnerList.push(separate[i])
+            if (separate[i] === `=====${label}=====`) {
+              hasSeparate = true
+            }
+          }
+        }
+        if (!hasSeparate) {
+          newWinnerList.push(`=====${label}=====`)
+          drawAmountA = 0
+          nowDrawNumberA.innerText = drawAmountA
+          winnerListA = newWinnerList
+        } else {
+          drawAmountA = count
+          nowDrawNumberA.innerText = drawAmountA
+          winnerListA = newWinnerList
+        }
+      }
+      let removeIndex = winnerNames.indexOf(lastPerson)
+      winnerNames.splice(removeIndex, 1)
+      if (reverse) {
+        if (lastPerson.includes('=====')) {
           toastr.success(`準備抽出第一位幸運兒`)
         } else {
           toastr.success(`${lastPerson}已回到天台 準備開飛`)
         }
       }
+
+      console.log(lastPerson);
+      console.log(winnerNames);
     } else {
-      winnerList = [`=====${nowAward}=====`]
-      winnerNames = [`=====${nowAward}=====`]
+      winnerList = [`=====${label}=====`]
+      winnerNames = [`=====${label}=====`]
     }
-    
     renewWinnerForm()
   }
 
