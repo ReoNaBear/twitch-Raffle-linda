@@ -396,7 +396,7 @@
         <div class="btn-group" role="group" aria-label="Basic outlined example">
           <div class="col-6">
             <button type="button" class="copy btn multipleTransformBtn" style="background-color: #D2BBF2; color: #000;"
-              disabled>當前獎項已中獎數: A:<span class="draw-AmountA">0</span> B:<span class="draw-AmountB">0</span> </button>
+              disabled>當前獎項已中獎數: <span class="draw-LabelA">吊飾</span>:<span class="draw-AmountA">0</span> <span class="draw-LabelB">明信片</span>:<span class="draw-AmountB">0</span> </button>
           </div>
           <div class="col-6">
             <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" checked>
@@ -428,10 +428,10 @@
           當前獎項
         </div>
         <select class="form-select" aria-label="Default select example">
-          <option selected value="A">A</option>
-          <option value="B">B</option>
-          <option value="C">C</option>
-          <option value="D">D</option>
+          <option selected value="A">吊飾</option>
+          <option value="B">明信片</option>
+          <option value="C">加碼一</option>
+          <option value="D">加碼二</option>
         </select>
       </div>
       <h5 style=" text-align: center;"><i class="fa-solid fa-face-smile-wink"></i> 小提示: 點擊右方把手即可開始抽獎</h5>
@@ -481,6 +481,9 @@
   let awardTitle = document.querySelector('.form-select')
   let nowDrawNumberA = document.querySelector('.draw-AmountA')
   let nowDrawNumberB = document.querySelector('.draw-AmountB')
+  let drawLabelA = document.querySelector('.draw-LabelA')
+  let drawLabelB = document.querySelector('.draw-LabelB')
+
   let nowPlaying = false
   let awardChange = false
   let autoFilter = true
@@ -513,9 +516,6 @@
   //拉霸動畫控制
   ball.addEventListener('animationend', function () {
     ball.classList.remove('ballMoving')
-    setTimeout(() => {
-      nowPlaying = false
-    }, 3000);
   })
   handle.addEventListener('animationend', function () {
     handle.classList.remove('verticleMoving')
@@ -611,6 +611,7 @@
             } else {
               toastr.error('請輸入抽獎名單或所有參與者皆已中獎')
               text = '泥泥生日快樂!!!'
+              nowPlaying = false
             }
             drawAnimationDetail(text)
           }
@@ -845,6 +846,7 @@
             drawAmountA = indexOfEnd - indexOfC + 1
           }
         }
+        drawLabelA.innerText = label
         nowDrawNumberA.innerText = drawAmountA
       } else {
         let indexOfEnd = winnerListB.length - 1
@@ -878,6 +880,7 @@
             drawAmountB = indexOfEnd - indexOfD + 1
             winnerListB.push(winner.trim().split(/\s+/)[1])
           }
+          drawLabelB.innerText = label
           nowDrawNumberB.innerText = drawAmountB
         }
       }
@@ -885,8 +888,9 @@
       if (!nowAwardSide) {
         drawAmountA += 1
         nowDrawNumberA.innerText = drawAmountA
-        if (!winnerListA.includes(`=====${nowAward}=====`)) {
-          winnerListA.push(`=====${nowAward}=====`)
+        drawLabelA.innerText = label
+        if (!winnerListA.includes(`=====${label}=====`)) {
+          winnerListA.push(`=====${label}=====`)
         }
         if (awardTitle.value === 'A') {
           if (indexOfA > indexOfC || indexOfC === -1) {
@@ -905,8 +909,9 @@
       } else {
         drawAmountB += 1
         nowDrawNumberB.innerText = drawAmountB
-        if (!winnerListB.includes(`=====${nowAward}=====`)) {
-          winnerListB.push(`=====${nowAward}=====`)
+        drawLabelB.innerText = label
+        if (!winnerListB.includes(`=====${label}=====`)) {
+          winnerListB.push(`=====${label}=====`)
         }
         if (awardTitle.value === 'B') {
           if (indexOfB > indexOfD || indexOfD === -1) {
@@ -950,6 +955,7 @@
     }
     winnerNamesHtml = winnerFormA.innerHTML + winnerFormB.innerHTML
     winnerNamesForm.innerHTML = winnerNamesHtml
+    nowPlaying = false
   }
 
   //中獎名單模式切換
@@ -987,7 +993,7 @@
     if (!!winnerFormEditA.value || !!winnerFormEditB.value) {
       let hasSeparate = false
       let newWinnerList = []
-
+      let count = 0
       if (nowAwardSide) {
         let separate = winnerFormEditB.value.trim().split(/\s+/)
         console.log(separate);
@@ -996,21 +1002,24 @@
             if (indexOfB > indexOfD || indexOfD === -1) {
               let remove = separate.splice(-1, 1)
               lastPerson = remove[0]
+              count = separate.length - indexOfB - 1
             } else if (indexOfD > indexOfB) {
               let remove = separate.splice(indexOfD - 1, 1)
               lastPerson = remove[0]
+              count = indexOfD - 2
             }
           } else if (awardTitle.value === 'D') {
             if (indexOfD > indexOfB || indexOfB === -1) {
               let remove = separate.splice(-1, 1)
               lastPerson = remove[0]
+              count = separate.length - indexOfD - 1
             } else if (indexOfB > indexOfD) {
-              let remove = separate.splice(indexOfB, 1)
+              let remove = separate.splice(indexOfB - 1, 1)
               lastPerson = remove[0]
+              count = indexOfB - 2
             }
           }
         }
-        let count = 0
 
         for (let i = 0; i < separate.length; i++) {
           if (!separate[i].includes('=====')) {
@@ -1029,11 +1038,13 @@
           newWinnerList.push(`=====${label}=====`)
           drawAmountB = 0
           nowDrawNumberB.innerText = drawAmountB
+          drawLabelB.innerText = label
           winnerListB = newWinnerList
         } else {
           drawAmountB = count
           nowDrawNumberB.innerText = drawAmountB
           winnerListB = newWinnerList
+          drawLabelB.innerText = label
         }
       } else {
         let separate = winnerFormEditA.value.trim().split(/\s+/)
@@ -1043,21 +1054,24 @@
             if (indexOfA > indexOfC || indexOfC === -1) {
               let remove = separate.splice(-1, 1)
               lastPerson = remove[0]
+              count = separate.length - indexOfA - 1
             } else if (indexOfC > indexOfA) {
               let remove = separate.splice(indexOfC - 1, 1)
               lastPerson = remove[0]
+              count = indexOfC - 2
             }
           } else if (awardTitle.value === 'C') {
             if (indexOfC > indexOfA || indexOfA === -1) {
               let remove = separate.splice(-1, 1)
               lastPerson = remove[0]
+              count = separate.length - indexOfC - 1
             } else if (indexOfA > indexOfC) {
               let remove = separate.splice(indexOfA - 1, 1)
               lastPerson = remove[0]
+              count = indexOfA - 2
             }
           }
         }
-        let count = 0
         for (let i = 0; i < separate.length; i++) {
           if (!separate[i].includes('=====')) {
             count = count + 1
@@ -1075,9 +1089,11 @@
           newWinnerList.push(`=====${label}=====`)
           drawAmountA = 0
           nowDrawNumberA.innerText = drawAmountA
+          drawLabelA.innerText = label
           winnerListA = newWinnerList
         } else {
           drawAmountA = count
+          drawLabelA.innerText = label
           nowDrawNumberA.innerText = drawAmountA
           winnerListA = newWinnerList
         }
