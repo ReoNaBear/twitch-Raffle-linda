@@ -594,7 +594,7 @@
           .then(data => {
             if (!data) {
               toastr.error('請先輸入抽獎者名單')
-              text = '泥泥生日快樂!!!'
+              text = '泥泥兩千追&生日快樂!!!'
             }
             else {
               text = drawList[data - 1]
@@ -609,7 +609,7 @@
               setWinnerList(drawList[0])
             } else {
               toastr.error('請輸入抽獎名單或所有參與者皆已中獎')
-              text = '泥泥生日快樂!!!'
+              text = '泥泥兩千追&生日快樂!!!'
               nowPlaying = false
             }
             drawAnimationDetail(text)
