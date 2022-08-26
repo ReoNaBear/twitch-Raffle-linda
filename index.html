@@ -1168,8 +1168,16 @@
       }
 
     } else {
-      winnerList = [`=====${label}=====`]
+      winnerListA = []
+      winnerListB = []
+      if(nowAwardSide){
+        winnerListB = [`=====${label}=====`]
+      } else {
+        winnerListA = [`=====${label}=====`]
+      }
       winnerNames = [`=====${label}=====`]
+      drawAmountA = 0
+      drawAmountB = 0
     }
     renewWinnerForm(true)
   }
