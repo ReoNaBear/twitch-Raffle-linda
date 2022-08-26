@@ -505,9 +505,9 @@
       awardChange = false
       newAward = ''
     }
-    console.log(awardTitle.value);
     if (awardTitle.value === 'A' || awardTitle.value === 'C') {
       nowAwardSide = false
+      
     } else {
       nowAwardSide = true
     }
@@ -598,7 +598,6 @@
             }
             else {
               text = drawList[data - 1]
-              console.log(drawList[data - 1]);
               setWinnerList(drawList[data - 1])
             }
             drawAnimationDetail(text)
@@ -808,15 +807,17 @@
     let indexOfC = winnerListA.indexOf(`=====${awardTitle.querySelector('option[value="C"]').innerText}=====`)
     let indexOfB = winnerListB.indexOf(`=====${awardTitle.querySelector('option[value="B"]').innerText}=====`)
     let indexOfD = winnerListB.indexOf(`=====${awardTitle.querySelector('option[value="D"]').innerText}=====`)
-
+    
     if (awardChange) {
       nowAward = newAward
       awardChange = false
       newAward = ''
       if (!nowAwardSide) {
+        console.log(`當前獎項 ${label} 準備抽出第${drawAmountA + 1}個幸運兒`);
+        console.log(winner);
         let indexOfEnd = winnerListA.length - 1
         if (!winnerListA.includes(`=====${label}=====`)) {
-          drawAmountA = 1
+          drawAmountA = 0 + 1
           winnerListA.push(`=====${label}=====`)
           winnerListA.push(winner.trim().split(/\s+/)[1])
         } else {
@@ -849,9 +850,11 @@
         drawLabelA.innerText = label
         nowDrawNumberA.innerText = drawAmountA
       } else {
+        console.log(`當前獎項 ${label} 準備抽出第${drawAmountB + 1}個幸運兒`);
+        console.log(winner);
         let indexOfEnd = winnerListB.length - 1
         if (!winnerListB.includes(`=====${label}=====`)) {
-          drawAmountB = 1
+          drawAmountB = 0 + 1
           winnerListB.push(`=====${label}=====`)
           winnerListB.push(winner.trim().split(/\s+/)[1])
         } else {
@@ -880,12 +883,14 @@
             drawAmountB = indexOfEnd - indexOfD + 1
             winnerListB.push(winner.trim().split(/\s+/)[1])
           }
-          drawLabelB.innerText = label
-          nowDrawNumberB.innerText = drawAmountB
         }
+        drawLabelB.innerText = label
+        nowDrawNumberB.innerText = drawAmountB
       }
     } else {
       if (!nowAwardSide) {
+        console.log(`當前獎項 ${label} 準備抽出第${drawAmountA + 1}個幸運兒`);
+        console.log(winner);
         drawAmountA += 1
         nowDrawNumberA.innerText = drawAmountA
         drawLabelA.innerText = label
@@ -907,6 +912,8 @@
         }
 
       } else {
+        console.log(`當前獎項 ${label} 準備抽出第${drawAmountB + 1}個幸運兒`);
+        console.log(winner);
         drawAmountB += 1
         nowDrawNumberB.innerText = drawAmountB
         drawLabelB.innerText = label
@@ -928,31 +935,42 @@
         }
       }
     }
+    renewWinnerForm()
 
-    setTimeout(() => {
-      renewWinnerForm()
-    }, 4500);
 
   }
   //重新整理得獎者名單
-  function renewWinnerForm() {
+  function renewWinnerForm(fast) {
     outputDrawList()
-    let winnerHtml = ''
+    let winnerHtmlA = ''
+    let winnerHtmlB = ''
     let winnerNamesHtml = ''
     let nowWinnerList
-    if (!nowAwardSide) {
-      for (let i = 0; i < winnerListA.length; i++) {
-        winnerHtml = winnerHtml + `${winnerListA[i]}\n`
-      }
-      winnerFormA.innerHTML = winnerHtml
+    for (let i = 0; i < winnerListA.length; i++) {
+      winnerHtmlA = winnerHtmlA + `${winnerListA[i]}\n`
+    }
+    if(fast){
+      winnerFormA.innerHTML = winnerHtmlA
       winnerFormEditA.value = winnerFormA.value
     } else {
-      for (let i = 0; i < winnerListB.length; i++) {
-        winnerHtml = winnerHtml + `${winnerListB[i]}\n`
-      }
-      winnerFormB.innerHTML = winnerHtml
-      winnerFormEditB.value = winnerFormB.value
+      setTimeout(() => {
+        winnerFormA.innerHTML = winnerHtmlA
+        winnerFormEditA.value = winnerFormA.value
+      }, 3000);
     }
+    for (let i = 0; i < winnerListB.length; i++) {
+      winnerHtmlB = winnerHtmlB + `${winnerListB[i]}\n`
+    }
+    if(fast){
+      winnerFormB.innerHTML = winnerHtmlB
+      winnerFormEditB.value = winnerFormB.value
+    } else {
+      setTimeout(() => {
+        winnerFormB.innerHTML = winnerHtmlB
+        winnerFormEditB.value = winnerFormB.value
+      }, 3000);
+    }
+
     winnerNamesHtml = winnerFormA.innerHTML + winnerFormB.innerHTML
     winnerNamesForm.innerHTML = winnerNamesHtml
     nowPlaying = false
@@ -994,10 +1012,53 @@
       let hasSeparate = false
       let newWinnerList = []
       let count = 0
-      if (nowAwardSide) {
-        let separate = winnerFormEditB.value.trim().split(/\s+/)
-        console.log(separate);
-        if (reverse) {
+      if(!reverse){
+        let countA = 0
+        let countB = 0
+        let separateA = winnerFormEditA.value.trim().split(/\s+/)
+        let separateB = winnerFormEditB.value.trim().split(/\s+/)
+        winnerListA = []
+        winnerListB = []
+        for (let i = 0; i < separateA.length; i++) {
+          winnerListA.push(separateA[i])
+          if (!separateA[i].includes('=====')) {
+            countA = countA +1
+          }
+          else {
+            countA = 0
+            if (separateA[i] === `=====${label}=====`) {
+              hasSeparate = true
+            }
+          }
+        }
+        if (!hasSeparate && !nowAwardSide) {
+          winnerListA.push(`=====${label}=====`)
+        }
+        nowDrawNumberA.innerText = countA
+
+        for (let i = 0; i < separateB.length; i++) {
+          winnerListB.push(separateB[i])
+          if (!separateB[i].includes('=====')) {
+            countB = countB +1
+          }
+          else {
+            countB = 0
+            if (separateB[i] === `=====${label}=====`) {
+              hasSeparate = true
+            }
+          }
+        }
+        if (!hasSeparate && nowAwardSide) {
+          winnerListB.push(`=====${label}=====`)
+        }
+        drawAmountA = countA
+        drawAmountB = countB
+        nowDrawNumberB.innerText = countB
+        newWinnerList = winnerListA.concat(winnerListB)
+        winnerNames = newWinnerList
+      } else {
+        if (nowAwardSide) {
+          let separate = winnerFormEditB.value.trim().split(/\s+/)
           if (awardTitle.value === 'B') {
             if (indexOfB > indexOfD || indexOfD === -1) {
               let remove = separate.splice(-1, 1)
@@ -1019,37 +1080,34 @@
               count = indexOfB - 2
             }
           }
-        }
-
-        for (let i = 0; i < separate.length; i++) {
-          if (!separate[i].includes('=====')) {
-            count = count + 1
-            newWinnerList.push(separate[i])
-          }
-          else {
-            count = 0
-            newWinnerList.push(separate[i])
-            if (separate[i] === `=====${label}=====`) {
-              hasSeparate = true
+          for (let i = 0; i < separate.length; i++) {
+            if (!separate[i].includes('=====')) {
+              if(!reverse){
+                count = count +1
+              }
+              newWinnerList.push(separate[i])
+            }
+            else {
+              newWinnerList.push(separate[i])
+              if(!reverse){
+                count = 0
+              }
+              if (separate[i] === `=====${label}=====`) {
+                hasSeparate = true
+              }
             }
           }
-        }
-        if (!hasSeparate) {
-          newWinnerList.push(`=====${label}=====`)
-          drawAmountB = 0
+          if (!hasSeparate) {
+            newWinnerList.push(`=====${label}=====`)
+            drawAmountB = 0
+          } else {
+            drawAmountB = count
+          }
           nowDrawNumberB.innerText = drawAmountB
-          drawLabelB.innerText = label
           winnerListB = newWinnerList
+          drawLabelB.innerText = label
         } else {
-          drawAmountB = count
-          nowDrawNumberB.innerText = drawAmountB
-          winnerListB = newWinnerList
-          drawLabelB.innerText = label
-        }
-      } else {
-        let separate = winnerFormEditA.value.trim().split(/\s+/)
-        if (reverse) {
-
+          let separate = winnerFormEditA.value.trim().split(/\s+/)
           if (awardTitle.value === 'A') {
             if (indexOfA > indexOfC || indexOfC === -1) {
               let remove = separate.splice(-1, 1)
@@ -1070,37 +1128,38 @@
               lastPerson = remove[0]
               count = indexOfA - 2
             }
-          }
-        }
-        for (let i = 0; i < separate.length; i++) {
-          if (!separate[i].includes('=====')) {
-            count = count + 1
-            newWinnerList.push(separate[i])
-          }
-          else {
+          } else  {
             count = 0
-            newWinnerList.push(separate[i])
-            if (separate[i] === `=====${label}=====`) {
-              hasSeparate = true
+          }
+          for (let i = 0; i < separate.length; i++) {
+            if (!separate[i].includes('=====')) {
+              newWinnerList.push(separate[i])
+              if(!reverse){
+                count = count + 1
+              }
+            }
+            else {
+              newWinnerList.push(separate[i])
+              if(!reverse){
+                count = 0
+              }
+              if (separate[i] === `=====${label}=====`) {
+                hasSeparate = true
+              }
             }
           }
+          if (!hasSeparate) {
+            newWinnerList.push(`=====${label}=====`)
+            drawAmountA = 0
+          } else {
+            drawAmountA = count
+          }
+            drawLabelA.innerText = label
+            nowDrawNumberA.innerText = drawAmountA
+            winnerListA = newWinnerList
         }
-        if (!hasSeparate) {
-          newWinnerList.push(`=====${label}=====`)
-          drawAmountA = 0
-          nowDrawNumberA.innerText = drawAmountA
-          drawLabelA.innerText = label
-          winnerListA = newWinnerList
-        } else {
-          drawAmountA = count
-          drawLabelA.innerText = label
-          nowDrawNumberA.innerText = drawAmountA
-          winnerListA = newWinnerList
-        }
-      }
-      let removeIndex = winnerNames.indexOf(lastPerson)
-      winnerNames.splice(removeIndex, 1)
-      if (reverse) {
+        let removeIndex = winnerNames.indexOf(lastPerson)
+        winnerNames.splice(removeIndex, 1)
         if (lastPerson.includes('=====')) {
           toastr.success(`準備抽出第一位幸運兒`)
         } else {
@@ -1108,13 +1167,11 @@
         }
       }
 
-      console.log(lastPerson);
-      console.log(winnerNames);
     } else {
       winnerList = [`=====${label}=====`]
       winnerNames = [`=====${label}=====`]
     }
-    renewWinnerForm()
+    renewWinnerForm(true)
   }
 
   //刪除中獎的那些資料
