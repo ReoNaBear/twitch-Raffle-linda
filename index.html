@@ -396,7 +396,7 @@
         <div class="btn-group" role="group" aria-label="Basic outlined example">
           <div class="col-6">
             <button type="button" class="copy btn multipleTransformBtn" style="background-color: #D2BBF2; color: #000;"
-              disabled>已中獎數:<span class="draw-LabelA"> 立牌</span>:<span class="draw-AmountA">0</span> <span class="draw-LabelB"> 杯墊</span>:<span class="draw-AmountB">0</span> </button>
+              disabled>已中獎數:<span class="draw-LabelA"> 杯套</span>:<span class="draw-AmountA">0</span> <span class="draw-LabelB"> 鍵帽</span>:<span class="draw-AmountB">0</span> </button>
           </div>
           <div class="col-6">
             <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" checked>
@@ -428,9 +428,9 @@
           當前獎項
         </div>
         <select class="form-select" aria-label="Default select example">
-          <option selected value="A">立牌</option>
-          <option value="B">杯墊</option>
-          <option value="C">飯友</option>
+          <option selected value="A">杯套</option>
+          <option value="B">鍵帽</option>
+          <option value="C">壓克力手機架</option>
           <option value="D">加碼</option>
         </select>
       </div>
@@ -562,7 +562,7 @@
   })
 
   // 初始抽獎動畫
-  let text = '8/15這天是泥泥生日yo!';  // The message displayed
+  let text = '還不快來慶祝兩周年!!';  // The message displayed
   let chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890() ';  // All possible Charactrers
   let scale = 40;  // Font size and overall scale
   let breaks = 0.003;  // Speed loss per frame
@@ -594,7 +594,7 @@
           .then(data => {
             if (!data) {
               toastr.error('請先輸入抽獎者名單')
-              text = '泥泥生日大快樂!!!~'
+              text = '泥泥兩周年大快樂!!!~'
             }
             else {
               text = drawList[data - 1]
@@ -609,7 +609,7 @@
               setWinnerList(drawList[0])
             } else {
               toastr.error('請輸入抽獎名單或所有參與者皆已中獎')
-              text = '泥泥生日大快樂!!!~'
+              text = '泥泥兩周年大快樂!!!~'
               nowPlaying = false
             }
             drawAnimationDetail(text)
