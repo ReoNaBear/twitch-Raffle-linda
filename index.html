@@ -396,7 +396,7 @@
         <div class="btn-group" role="group" aria-label="Basic outlined example">
           <div class="col-6">
             <button type="button" class="copy btn multipleTransformBtn" style="background-color: #D2BBF2; color: #000;"
-              disabled>已中獎數:<span class="draw-LabelA"> 御守</span>:<span class="draw-AmountA">0</span> <span class="draw-LabelB"> 蘿蔔糰子</span>:<span class="draw-AmountB">0</span> </button>
+              disabled>已中獎數:<span class="draw-LabelA"> 燈光畫</span>:<span class="draw-AmountA">0</span> <span class="draw-LabelB"> 卡套</span>:<span class="draw-AmountB">0</span> </button>
           </div>
           <div class="col-6">
             <input type="checkbox" class="btn-check" id="btncheck1" autocomplete="off" checked>
@@ -428,10 +428,10 @@
           當前獎項
         </div>
         <select class="form-select" aria-label="Default select example">
-          <option selected value="A">御守</option>
-          <option value="B">蘿蔔糰子</option>
-          <option value="C">毯子</option>
-          <option value="D">吊飾</option>
+          <option selected value="A">燈光畫</option>
+          <option value="B">卡套</option>
+          <option value="C">咖啡勺</option>
+          <option value="D" style="display: none;"></option>
         </select>
       </div>
       <h5 style=" text-align: center;"><i class="fa-solid fa-face-smile-wink"></i> 小提示: 點擊右方把手即可開始抽獎</h5>
@@ -609,7 +609,7 @@
               setWinnerList(drawList[0])
             } else {
               toastr.error('請輸入抽獎名單或所有參與者皆已中獎')
-              text = '泥泥兩周年大快樂!!!~'
+              text = '泥泥生日大快樂!!!~'
               nowPlaying = false
             }
             drawAnimationDetail(text)
